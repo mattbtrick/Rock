@@ -639,11 +639,11 @@ namespace Rock.WebStartup
 
                     if ( shortcodeDefinition.TagType == TagType.Block )
                     {
-                        newShortcode.ElementType = LavaElementTypeSpecifier.Block;
+                        newShortcode.ElementType = LavaShortcodeTypeSpecifier.Block;
                     }
                     else
                     {
-                        newShortcode.ElementType = LavaElementTypeSpecifier.Inline;
+                        newShortcode.ElementType = LavaShortcodeTypeSpecifier.Inline;
                     }
                 }
 
@@ -671,7 +671,7 @@ namespace Rock.WebStartup
                 {
                     var blockInstance = Activator.CreateInstance( blockType ) as IRockLavaBlock;
 
-                    engine.RegisterBlock( blockInstance.BlockName, ( blockName ) =>
+                    engine.RegisterBlock( blockInstance.SourceElementName, ( blockName ) =>
                     {
                         return Activator.CreateInstance( blockType ) as IRockLavaBlock;
                     } );
