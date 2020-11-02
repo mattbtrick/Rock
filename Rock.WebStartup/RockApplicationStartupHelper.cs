@@ -35,6 +35,7 @@ using Rock.Data;
 using Rock.Jobs;
 using Rock.Lava;
 using Rock.Lava.Blocks;
+using Rock.Lava.Utility;
 using Rock.Model;
 using Rock.Web.Cache;
 using Rock.WebFarm;
@@ -636,7 +637,12 @@ namespace Rock.WebStartup
 
                     newShortcode.Name = shortcodeDefinition.Name;
                     newShortcode.TemplateMarkup = shortcodeDefinition.Markup;
-                    newShortcode.Tokens = shortcodeDefinition.Parameters.SplitDelimitedValues( ";" ).ToList();
+
+                    var parameters = RockSerializableDictionary.FromUriEncodedString( shortcodeDefinition.Parameters );
+
+                    newShortcode.Parameters = new Dictionary<string, string>( parameters.Dictionary );
+
+                    newShortcode.EnabledLavaCommands = shortcodeDefinition.EnabledLavaCommands.SplitDelimitedValues( "," ).ToList();
 
                     if ( shortcodeDefinition.TagType == TagType.Block )
                     {
