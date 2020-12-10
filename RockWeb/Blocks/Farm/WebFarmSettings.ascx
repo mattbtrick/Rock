@@ -24,7 +24,7 @@
                         <div class="col-md-8">
                             <h5>Nodes</h5>
                             <div class="row">
-                                <asp:Repeater ID="rNodes" runat="server">
+                                <asp:Repeater ID="rNodes" runat="server" OnItemCommand="rNodes_ItemCommand">
                                     <ItemTemplate>
                                         <div class="col-sm-6 col-md-4 col-lg-3">
                                             <h6><%# Eval("NodeName") %></h6>
@@ -40,6 +40,9 @@
                                                 <dt>Polling Interval Seconds</dt>
                                                 <dd><%# Eval("PollingIntervalSeconds") %></dd>
                                             </dl>
+                                            <asp:LinkButton runat="server" CommandArgument='<%# Eval("Id") %>'>
+                                                Detail
+                                            </asp:LinkButton>
                                         </div>
                                     </ItemTemplate>
                                 </asp:Repeater>

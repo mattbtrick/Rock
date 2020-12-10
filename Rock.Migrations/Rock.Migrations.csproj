@@ -69,6 +69,10 @@
     <Compile Include="Migrations\202012092122418_KpiShortCodeEdit.Designer.cs">
       <DependentUpon>202012092122418_KpiShortCodeEdit.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202012101439362_WebFarmNodeMetric.cs" />
+    <Compile Include="Migrations\202012101439362_WebFarmNodeMetric.Designer.cs">
+      <DependentUpon>202012101439362_WebFarmNodeMetric.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Version 12.0\Version 1.12.0\202012011753406_Rollup_1201.cs" />
     <Compile Include="Migrations\Version 12.0\Version 1.12.0\202012011753406_Rollup_1201.Designer.cs">
       <DependentUpon>202012011753406_Rollup_1201.cs</DependentUpon>
@@ -1516,6 +1520,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202012092122418_KpiShortCodeEdit.resx">
       <DependentUpon>202012092122418_KpiShortCodeEdit.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202012101439362_WebFarmNodeMetric.resx">
+      <DependentUpon>202012101439362_WebFarmNodeMetric.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\Version 12.0\Version 1.12.0\202012011753406_Rollup_1201.resx">
       <DependentUpon>202012011753406_Rollup_1201.cs</DependentUpon>
