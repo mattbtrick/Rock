@@ -1763,18 +1763,30 @@ namespace Rock.Model
             // Exclude GroupMemberAssignments that don't have a schedule or location set (since that means they don't want to be auto-scheduled)
             groupMemberAssignmentsQuery = groupMemberAssignmentsQuery.Where( a => a.LocationId.HasValue || a.ScheduleId.HasValue );
 
+            var endOfOccurenceDay = attendanceOccurrence.OccurrenceDate.AddHours( 23 ).AddMinutes( 59 ).AddSeconds( 59 );
             var groupMemberAssignmentsList = groupMemberAssignmentsQuery
-                .GroupJoin( rockContext.Attendances, gma => gma.GroupMember.PersonId, a => a.PersonAlias.PersonId,
+                .Select( a => new {
+                    GroupMemberId = a.GroupMember.Id,
+                    a.GroupMember.PersonId,
+                    a.LocationId,
+                    a.ScheduleId,
+                    SpecificLocationAndSchedule = a.LocationId.HasValue && a.ScheduleId.HasValue,
+                    SpecificScheduleOnly = !a.LocationId.HasValue && a.ScheduleId.HasValue,
+                    SpecificLocationOnly = !a.LocationId.HasValue && !a.ScheduleId.HasValue,
+                })
+                .GroupJoin( rockContext.Attendances, gma => gma.PersonId, a => a.PersonAlias.PersonId,
                     ( gma, a ) => new GroupMemberAssignmentInfo
                     {
-                        GroupMemberId = gma.GroupMember.Id,
-                        PersonId = gma.GroupMember.PersonId,
+                        GroupMemberId = gma.GroupMemberId,
+                        PersonId = gma.PersonId,
                         LocationId = gma.LocationId,
                         ScheduleId = gma.ScheduleId,
                         SpecificLocationAndSchedule = gma.LocationId.HasValue && gma.ScheduleId.HasValue,
                         SpecificScheduleOnly = !gma.LocationId.HasValue && gma.ScheduleId.HasValue,
                         SpecificLocationOnly = !gma.LocationId.HasValue && !gma.ScheduleId.HasValue,
-                        LastScheduledDate = a.Where( att => ( att.ScheduledToAttend != null && att.ScheduledToAttend.Value ) || ( att.RequestedToAttend != null && att.RequestedToAttend.Value ) )
+                        LastScheduledDate = a
+                            .Where( att => ( att.ScheduledToAttend != null && att.ScheduledToAttend.Value ) || ( att.RequestedToAttend != null && att.RequestedToAttend.Value ) )
+                            .Where( att => att.StartDateTime <= endOfOccurenceDay )
                             .Select( att => att.StartDateTime )
                             .DefaultIfEmpty()
                             .Max()
