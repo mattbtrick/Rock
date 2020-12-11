@@ -1763,7 +1763,7 @@ namespace Rock.Model
             // Exclude GroupMemberAssignments that don't have a schedule or location set (since that means they don't want to be auto-scheduled)
             groupMemberAssignmentsQuery = groupMemberAssignmentsQuery.Where( a => a.LocationId.HasValue || a.ScheduleId.HasValue );
 
-            var endOfOccurenceDay = attendanceOccurrence.OccurrenceDate.AddHours( 23 ).AddMinutes( 59 ).AddSeconds( 59 );
+            var endOfOccurrenceDay = attendanceOccurrence.OccurrenceDate.AddHours( 23 ).AddMinutes( 59 ).AddSeconds( 59 );
             var groupMemberAssignmentsList = groupMemberAssignmentsQuery
                 .Select( a => new {
                     GroupMemberId = a.GroupMember.Id,
@@ -1786,7 +1786,7 @@ namespace Rock.Model
                         SpecificLocationOnly = !gma.LocationId.HasValue && !gma.ScheduleId.HasValue,
                         LastScheduledDate = a
                             .Where( att => ( att.ScheduledToAttend != null && att.ScheduledToAttend.Value ) || ( att.RequestedToAttend != null && att.RequestedToAttend.Value ) )
-                            .Where( att => att.StartDateTime <= endOfOccurenceDay )
+                            .Where( att => att.StartDateTime <= endOfOccurrenceDay )
                             .Select( att => att.StartDateTime )
                             .DefaultIfEmpty()
                             .Max()
