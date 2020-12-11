@@ -1769,10 +1769,7 @@ namespace Rock.Model
                     GroupMemberId = a.GroupMember.Id,
                     a.GroupMember.PersonId,
                     a.LocationId,
-                    a.ScheduleId,
-                    SpecificLocationAndSchedule = a.LocationId.HasValue && a.ScheduleId.HasValue,
-                    SpecificScheduleOnly = !a.LocationId.HasValue && a.ScheduleId.HasValue,
-                    SpecificLocationOnly = !a.LocationId.HasValue && !a.ScheduleId.HasValue,
+                    a.ScheduleId
                 })
                 .GroupJoin( rockContext.Attendances, gma => gma.PersonId, a => a.PersonAlias.PersonId,
                     ( gma, a ) => new GroupMemberAssignmentInfo
