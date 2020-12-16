@@ -71,6 +71,51 @@ namespace RockWeb.Blocks.Farm
 
         #endregion View State
 
+        #region Properties
+
+        /// <summary>
+        /// Gets the rock context.
+        /// </summary>
+        /// <value>
+        /// The rock context.
+        /// </value>
+        private RockContext RockContext
+        {
+            get
+            {
+                if ( _rockContext == null )
+                {
+                    _rockContext = new RockContext();
+                }
+
+                return _rockContext;
+            }
+        }
+        private RockContext _rockContext = null;
+
+        /// <summary>
+        /// Gets the web farm node.
+        /// </summary>
+        /// <param name="rockContext">The rock context.</param>
+        /// <returns></returns>
+        private WebFarmNode WebFarmNode
+        {
+            get
+            {
+                if ( _node == null )
+                {
+                    var nodeId = GetWebFarmNodeId();
+                    var service = new WebFarmNodeService( RockContext );
+                    _node = service.Get( nodeId );
+                }
+
+                return _node;
+            }
+        }
+        private WebFarmNode _node = null;
+
+        #endregion Properties
+
         #region Control Methods
 
         /// <summary>
@@ -183,7 +228,7 @@ namespace RockWeb.Blocks.Farm
         /// </summary>
         public void RenderState()
         {
-            var node = GetWebFarmNode();
+            var node = WebFarmNode;
 
             if ( node == null )
             {
@@ -250,29 +295,6 @@ namespace RockWeb.Blocks.Farm
         {
             return PageParameter( PageParameterKey.WebFarmNodeId ).AsInteger();
         }
-
-        /// <summary>
-        /// Gets the web farm node.
-        /// </summary>
-        /// <param name="rockContext">The rock context.</param>
-        /// <returns></returns>
-        private WebFarmNode GetWebFarmNode( RockContext rockContext = null )
-        {
-            if ( _node == null || rockContext != null )
-            {
-                if ( rockContext == null )
-                {
-                    rockContext = new RockContext();
-                }
-
-                var nodeId = GetWebFarmNodeId();
-                var service = new WebFarmNodeService( rockContext );
-                _node = service.Get( nodeId );
-            }
-
-            return _node;
-        }
-        private WebFarmNode _node = null;
 
         #endregion Internal Methods
 
