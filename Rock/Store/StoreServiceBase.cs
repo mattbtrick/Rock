@@ -14,7 +14,9 @@
 // limitations under the License.
 // </copyright>
 //
+using System.Collections.Generic;
 using System.Configuration;
+using RestSharp;
 
 namespace Rock.Store
 {
@@ -40,6 +42,51 @@ namespace Rock.Store
         {
             // set configuration variables
             _rockStoreUrl = ConfigurationManager.AppSettings["RockStoreUrl"];
+        }
+
+        /// <summary>
+        /// Executes the rest get request.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="resource">The resource.</param>
+        /// <returns></returns>
+        public IRestResponse<T> ExecuteRestGetRequest<T>( string resource ) where T : new()
+        {
+            return ExecuteRestGetRequest<T>( resource, null );
+        }
+
+        /// <summary>
+        /// Executes the rest get request.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="resource">The resource.</param>
+        /// <param name="queryParameters">The query parameters.</param>
+        /// <returns></returns>
+        public IRestResponse<T> ExecuteRestGetRequest<T>( string resource, Dictionary<string, List<string>> queryParameters ) where T : new()
+        {
+            var client = new RestClient( _rockStoreUrl )
+            {
+                Timeout = _clientTimeout
+            };
+
+            var request = new RestRequest
+            {
+                Method = Method.GET,
+                Resource = resource
+            };
+
+            if ( queryParameters != null )
+            {
+                foreach ( var keyValuePair in queryParameters )
+                {
+                    foreach ( var item in keyValuePair.Value )
+                    {
+                        request.AddParameter( keyValuePair.Key, item, ParameterType.QueryString );
+                    }
+                }
+            }
+
+            return client.Execute<T>( request );
         }
     }
 }
