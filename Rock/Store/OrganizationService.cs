@@ -32,8 +32,8 @@ namespace Rock.Store
         /// <summary>
         /// Initializes a new instance of the <see cref="OrganizationService"/> class.
         /// </summary>
-        public OrganizationService() :base()
-        {}
+        public OrganizationService() : base()
+        { }
 
         /// <summary>
         /// Gets the organizations.
@@ -92,22 +92,50 @@ namespace Rock.Store
             var client = new RestClient( _rockStoreUrl );
             client.Timeout = _clientTimeout;
 
-            //return new StoreApiResult<Organization>
-            //{
-            //    Result = new Organization
-            //    {
-            //        Name = "Rock Solid Church",
-            //        State = "AZ",
-            //        City = "Pheonix",
-            //        LogoUrl = "../../Assets/Images/no-asset.svg",
-            //        AverageWeeklyAttendance = 1234
-            //    }
-            //};
-
             string encodedOrganizationKey = HttpUtility.UrlEncode( Convert.ToBase64String( Encoding.UTF8.GetBytes( organizationKey ) ) );
 
             string requestUrl = $"api/Store/RetrieveOrganization/{encodedOrganizationKey}";
             var request = new RestRequest( requestUrl, Method.GET );
+
+            // deserialize to list of packages
+            var response = client.Execute<Organization>( request );
+
+            if ( response.ResponseStatus == ResponseStatus.Completed )
+            {
+                return new StoreApiResult<Organization>
+                {
+                    Result = response.Data
+                };
+            }
+
+            return new StoreApiResult<Organization>
+            {
+                ErrorResponse = response.ErrorMessage
+            };
+        }
+
+        /// <summary>
+        /// Sets the size of the organization.
+        /// </summary>
+        /// <param name="username">The username.</param>
+        /// <param name="password">The password.</param>
+        /// <param name="organizationKey">The organization key.</param>
+        /// <param name="averageWeeklyAttendance">The average weekly attendance.</param>
+        /// <returns></returns>
+        public StoreApiResult<Organization> SetOrganizationSize( string username, string password, string organizationKey, int averageWeeklyAttendance )
+        {
+            // setup REST call
+            var client = new RestClient( _rockStoreUrl );
+            client.Timeout = _clientTimeout;
+
+            string encodedOrganizationKey = HttpUtility.UrlEncode( Convert.ToBase64String( Encoding.UTF8.GetBytes( organizationKey ) ) );
+            string encodedUserName = HttpUtility.UrlEncode( Convert.ToBase64String( Encoding.UTF8.GetBytes( username ) ) );
+            string encodedPassword = HttpUtility.UrlEncode( Convert.ToBase64String( Encoding.UTF8.GetBytes( password ) ) );
+            string requestUrl = string.Format( $"api/Store/SetOrganizationSize/{encodedUserName}/{encodedPassword}/{encodedOrganizationKey}" );
+
+            var request = new RestRequest( requestUrl, Method.POST );
+            request.RequestFormat = DataFormat.Json;
+            request.AddBody( averageWeeklyAttendance );
 
             // deserialize to list of packages
             var response = client.Execute<Organization>( request );
