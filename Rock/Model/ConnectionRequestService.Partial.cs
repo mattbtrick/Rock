@@ -559,7 +559,7 @@ namespace Rock.Model
                 viewModel.IsUnassigned
             };
 
-            mergeFields.Add( "ConnectionRequestStatusIcons", DotLiquid.Hash.FromAnonymousObject( connectionRequestStatusIcons ) );
+            mergeFields.Add( "ConnectionRequestStatusIcons", connectionRequestStatusIcons );
             mergeFields.Add( "IdleTooltip", string.Format( "Idle (no activity in {0} days)", connectionType.DaysUntilRequestIdle ) );
             return template.ResolveMergeFields( mergeFields );
         }
