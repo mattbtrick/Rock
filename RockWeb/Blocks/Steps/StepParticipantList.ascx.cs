@@ -335,7 +335,7 @@ namespace RockWeb.Blocks.Steps
             e.MergeValues.Add( "StepStatus", step.StepStatus.Name );
             e.MergeValues.Add( "StepName", step.StepType.Name );
 
-            dynamic dynamicAttributeCarrier = new RockDynamic();
+            dynamic dynamicAttributeCarrier = new LavaDataObject();
 
             foreach ( var attributeKeyValue in step.AttributeValues )
             {
@@ -1147,8 +1147,8 @@ namespace RockWeb.Blocks.Steps
         /// <summary>
         /// A view-model that represents a single row on the Steps Participant grid.
         /// </summary>
-        /// <seealso cref="RockDynamic" />
-        public class StepParticipantListViewModel : RockDynamic
+        /// <seealso cref="LavaDataObject" />
+        public class StepParticipantListViewModel : LavaDataObject
         {
             public int Id { get; set; }
             public int PersonId { get; set; }
