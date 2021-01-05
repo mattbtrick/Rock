@@ -59,12 +59,15 @@ namespace Rock.Store
         public List<Promo> GetPromos( int? categoryId, out string errorResponse, bool isTopFree = false, bool isFeatured = false, bool isTopPaid = false )
         {
             errorResponse = string.Empty;
+            var organizationKey = GetEncodedOrganizationKey();
 
             var requestPath = "Api/Promos/GetNonCategorized";
             if ( categoryId.HasValue )
             {
                 requestPath = $"Api/Promos/GetByCategory/{categoryId.Value}";
             }
+
+            requestPath = $"{requestPath}/{organizationKey}";
 
             var filters = new List<string>();
             if ( isTopFree )
@@ -90,7 +93,7 @@ namespace Rock.Store
             // deserialize to list of packages
             var response = ExecuteRestGetRequest<List<Promo>>( requestPath, queryParameters );
 
-            if ( response.ResponseStatus == ResponseStatus.Completed )
+            if ( response.ResponseStatus == ResponseStatus.Completed && response.Data != null )
             {
                 return response.Data;
             }

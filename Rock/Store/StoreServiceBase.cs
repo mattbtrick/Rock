@@ -14,8 +14,11 @@
 // limitations under the License.
 // </copyright>
 //
+using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Text;
+using System.Web;
 using RestSharp;
 
 namespace Rock.Store
@@ -87,6 +90,59 @@ namespace Rock.Store
             }
 
             return client.Execute<T>( request );
+        }
+
+        /// <summary>
+        /// Gets the organization key.
+        /// </summary>
+        /// <returns></returns>
+        public static string GetOrganizationKey()
+        {
+            string encryptedStoreKey = Rock.Web.SystemSettings.GetValue( "StoreOrganizationKey" );
+
+            string decryptedStoreKey = Rock.Security.Encryption.DecryptString( encryptedStoreKey );
+
+            if ( decryptedStoreKey == null && encryptedStoreKey.Length < 90 )
+            {
+                // if the decryption fails, it could be that the StoreOrganizationKey isn't encrypted, so encrypt and store it again 
+                decryptedStoreKey = encryptedStoreKey;
+                SetOrganizationKey( decryptedStoreKey );
+            }
+
+            if ( decryptedStoreKey == null || decryptedStoreKey.Length > 90 )
+            {
+                Model.ExceptionLogService.LogException( "The Rock 'Store Key' for the organization is too long. This typically means it was copied from another system and is unable to be decrypted by this system." );
+                return string.Empty;
+            }
+
+            return decryptedStoreKey;
+        }
+
+        /// <summary>
+        /// Gets the encoded organization key.
+        /// </summary>
+        /// <returns></returns>
+        public static string GetEncodedOrganizationKey()
+        {
+            var organizationKey = StoreService.GetOrganizationKey();
+            return HttpUtility.UrlEncode( Convert.ToBase64String( Encoding.UTF8.GetBytes( organizationKey ) ) );
+        }
+
+        /// <summary>
+        /// Sets the organization key.
+        /// </summary>
+        /// <param name="storeKey">The store key.</param>
+        public static void SetOrganizationKey( string storeKey )
+        {
+            Rock.Web.SystemSettings.SetValue( "StoreOrganizationKey", Rock.Security.Encryption.EncryptString( storeKey ) );
+        }
+
+        /// <summary>
+        /// Revokes the organization key.
+        /// </summary>
+        public static void RevokeOrganizationKey()
+        {
+            Rock.Web.SystemSettings.SetValue( "StoreOrganizationKey", null );
         }
     }
 }

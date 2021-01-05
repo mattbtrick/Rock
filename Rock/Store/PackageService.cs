@@ -75,7 +75,7 @@ namespace Rock.Store
             // deserialize to list of packages
             var response = ExecuteRestGetRequest<List<Package>>( resourcePath, queryParameters );
 
-            if ( response.ResponseStatus == ResponseStatus.Completed )
+            if ( response.ResponseStatus == ResponseStatus.Completed && response.Data != null )
             {
                 return response.Data;
             }

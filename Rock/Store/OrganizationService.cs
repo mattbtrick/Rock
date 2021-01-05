@@ -63,7 +63,7 @@ namespace Rock.Store
 
             var response = ExecuteRestGetRequest<List<Organization>>( $"api/Store/RetrieveOrganizations/{encodedUserName}/{encodedPassword}" );
 
-            if ( response.ResponseStatus == ResponseStatus.Completed )
+            if ( response.ResponseStatus == ResponseStatus.Completed && response.Data != null )
             {
                 return response.Data;
             }

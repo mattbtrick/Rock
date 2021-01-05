@@ -48,14 +48,12 @@ namespace Rock.Store
         /// <returns></returns>
         public IEnumerable<PackageCategory> GetCategories( out string errorResponse )
         {
-            var encodedOrganizationKey = StoreService.GetEncodedOrganizationKey();
-
             errorResponse = string.Empty;
 
             // deserialize to list of packages
-            var response = ExecuteRestGetRequest<List<PackageCategory>>( $"api/PackageCategories/List/{encodedOrganizationKey}" );
+            var response = ExecuteRestGetRequest<List<PackageCategory>>( $"api/PackageCategories/List" );
 
-            if ( response.ResponseStatus == ResponseStatus.Completed )
+            if ( response.ResponseStatus == ResponseStatus.Completed && response.Data != null )
             {
                 return response.Data;
             }
