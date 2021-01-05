@@ -108,10 +108,12 @@ namespace RockWeb.Blocks.Store
         {
             var storeOrganizationKey = StoreService.GetOrganizationKey();
 
-            pnlConfigureOrganization.Visible = storeOrganizationKey.IsNullOrWhiteSpace();
-            litOrganizationLava.Visible = storeOrganizationKey.IsNotNullOrWhiteSpace();
-
-            if ( litOrganizationLava.Visible )
+            if ( storeOrganizationKey.IsNullOrWhiteSpace() )
+            {
+                pnlConfigureOrganization.Visible = true;
+                litOrganizationLava.Visible = false;
+            }
+            else
             {
                 SetOrganizationLava( storeOrganizationKey );
             }
@@ -123,6 +125,13 @@ namespace RockWeb.Blocks.Store
         private void SetOrganizationLava( string storeOrganizationKey )
         {
             var organizationResult = new OrganizationService().GetOrganization( storeOrganizationKey );
+
+            if ( organizationResult.Result == null || organizationResult.Result.AverageWeeklyAttendance == 0 )
+            {
+                pnlConfigureOrganization.Visible = true;
+                litOrganizationLava.Visible = false;
+                return;
+            }
 
             // TODO: We will need to call the spark dev network api to get this data based on the storeOrganizationKey.
             var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( null );

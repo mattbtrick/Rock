@@ -16,8 +16,6 @@
 //
 using System.Collections.Generic;
 
-using Newtonsoft.Json;
-
 using RestSharp;
 
 
@@ -74,17 +72,30 @@ namespace Rock.Store
 
             // deserialize to list of packages
             var response = ExecuteRestGetRequest<List<Package>>( resourcePath, queryParameters );
+            var packageList = new List<Package>();
 
             if ( response.ResponseStatus == ResponseStatus.Completed && response.Data != null )
             {
-                return response.Data;
+                packageList = response.Data;
+
+                // If the key is null null out the price so it can't be installed.
+                if ( encodedOrganizationKey.IsNullOrWhiteSpace() )
+                {
+                    foreach ( var package in packageList )
+                    {
+                        if ( !package.IsFree )
+                        {
+                            package.Price = null;
+                        }
+                    }
+                }
             }
             else
             {
                 errorResponse = response.ErrorMessage;
-                return new List<Package>();
             }
 
+            return packageList;
         }
 
         /// <summary>
@@ -112,15 +123,25 @@ namespace Rock.Store
             var storeKey = StoreService.GetOrganizationKey();
             var response = ExecuteRestGetRequest<Package>( $"api/Packages/GetPackageDetails/{packageId}/{storeKey}", null );
 
+            var package = new Package();
+
             if ( response.ResponseStatus == ResponseStatus.Completed )
             {
-                return response.Data;
+                package = response.Data;
+                // If the key is null null out the price so it can't be installed.
+                if ( storeKey.IsNullOrWhiteSpace() )
+                {
+                    if ( !package.IsFree )
+                    {
+                        package.Price = null;
+                    }
+                }
             }
             else
             {
                 errorResponse = response.ErrorMessage;
-                return new Package();
             }
+            return package;
         }
 
         /// <summary>

@@ -67,7 +67,10 @@ namespace Rock.Store
                 requestPath = $"Api/Promos/GetByCategory/{categoryId.Value}";
             }
 
-            requestPath = $"{requestPath}/{organizationKey}";
+            if ( organizationKey.IsNotNullOrWhiteSpace() )
+            {
+                requestPath = $"{requestPath}/{organizationKey}";
+            }
 
             var filters = new List<string>();
             if ( isTopFree )
@@ -92,16 +95,30 @@ namespace Rock.Store
 
             // deserialize to list of packages
             var response = ExecuteRestGetRequest<List<Promo>>( requestPath, queryParameters );
+            var returnValue = new List<Promo>();
 
             if ( response.ResponseStatus == ResponseStatus.Completed && response.Data != null )
             {
-                return response.Data;
+                returnValue = response.Data;
+
+                // If no organization key then remove pricing data so it can't be installed.
+                if ( organizationKey.IsNullOrWhiteSpace() )
+                {
+                    foreach ( var promo in returnValue )
+                    {
+                        if ( promo.PackagePrice != 0 )
+                        {
+                            promo.PackagePrice = null;
+                        }
+                    }
+                }
             }
             else
             {
                 errorResponse = response.ErrorMessage;
-                return new List<Promo>();
             }
+
+            return returnValue;
         }
     }
 }
