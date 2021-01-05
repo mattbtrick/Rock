@@ -48,9 +48,10 @@
 
                 <asp:Panel ID="pnlAverageWeeklyAttendance" runat="server" Visible="false">
                     <div class="alert alert-info">
-                        <strong>Confirm:</strong>
+                        <p><strong>Confirm:</strong>
                         Please confirm the size of your organization below. This will update your organization size on the Spark server which impacts your suggested donation
-                        amount and the relative pricing of Rock Shop plugins.
+                        amount and the relative pricing of Rock Shop plugins.</p>
+                        <br />
                         <p>Rock runs on integrity so we rely on the information below being accurate.</p>
                     </div>
 

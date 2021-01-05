@@ -117,20 +117,31 @@ namespace RockWeb.Blocks.Store
 
             OrganizationService organizationService = new OrganizationService();
             Password = txtPassword.Text;
-            List<Organization> organizations = organizationService.GetOrganizations( txtUsername.Text, Password, out errorMessage ).ToList();
-
-            switch ( organizations.Count )
+            var organizations = organizationService.GetOrganizations( txtUsername.Text, Password, out errorMessage ).ToList();
+            if ( organizations.Count == 0 )
             {
-                case 1:
-                    SetOrganization( organizations.First() );
-                    break;
-                case 0:
-                    ProcessNoResults();
-                    break;
-                default:
-                    ProcessMultipleOrganizations( organizations );
-                    break;
+                ProcessNoResults();
+                return;
             }
+
+            var organizationKey = StoreService.GetOrganizationKey();
+            Organization selectedOrganization = null;
+            if ( organizationKey.IsNotNullOrWhiteSpace() )
+            {
+                selectedOrganization = organizations.FirstOrDefault( o => o.Key == organizationKey );
+            }
+            else if ( organizations.Count == 1 )
+            {
+                selectedOrganization = organizations.FirstOrDefault();
+            }
+
+            if ( selectedOrganization == null )
+            {
+                ProcessMultipleOrganizations( organizations );
+                return;
+            }
+
+            SetOrganization( selectedOrganization );
         }
 
         protected void rblOrganizations_SelectedIndexChanged( object sender, EventArgs e )
@@ -155,7 +166,7 @@ namespace RockWeb.Blocks.Store
         protected void btnContinue_Click( object sender, EventArgs e )
         {
             var returnUrl = PageParameter( "ReturnUrl" );
-            if (  returnUrl.IsNotNullOrWhiteSpace() )
+            if ( returnUrl.IsNotNullOrWhiteSpace() )
             {
                 Response.Redirect( returnUrl );
             }

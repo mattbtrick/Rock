@@ -133,6 +133,9 @@ namespace RockWeb.Blocks.Store
                 return;
             }
 
+            pnlConfigureOrganization.Visible = false;
+            litOrganizationLava.Visible = true;
+
             // TODO: We will need to call the spark dev network api to get this data based on the storeOrganizationKey.
             var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( null );
             mergeFields.Add( "Organization", organizationResult.Result );
