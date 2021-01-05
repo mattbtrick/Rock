@@ -313,14 +313,14 @@ namespace RockWeb.Blocks.Security
 
             rPhoneNumbers.ItemDataBound += rPhoneNumbers_ItemDataBound;
 
-            var regexString = ValidateUsernameAsEmail ? @"^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$" : Rock.Web.Cache.GlobalAttributesCache.Get().GetValue( "core.ValidUsernameRegularExpression" );
+            var regexString = ValidateUsernameAsEmail ? @"\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*" : Rock.Web.Cache.GlobalAttributesCache.Get().GetValue( "core.ValidUsernameRegularExpression" );
             var usernameValidCaption = ValidateUsernameAsEmail ? "" : Rock.Web.Cache.GlobalAttributesCache.Get().GetValue( "core.ValidUsernameCaption" );
 
             var script = string.Format( @" Sys.Application.add_load(function () {{
 var availabilityMessageRow = $('#availabilityMessageRow');
 var usernameUnavailable = $('#availabilityMessage');
 var usernameTextbox = $('#{0}');
-var usernameRegExp = new RegExp('{1}');
+var usernameRegExp = /{1}/;
 var usernameValidCaption = '{2}';
 var usernameFieldLabel = '{3}';
         
@@ -347,7 +347,7 @@ usernameTextbox.blur(function () {{
                         usernameUnavailable.removeClass('alert-warning');
                     }} else {{
                         availabilityMessageRow.show();
-                        usernameUnavailable.html('That ' + usernameFieldLabel + ' is already taken!');
+                        usernameUnavailable.html('That ' + usernameFieldLabel + ' is already taken.');
                         usernameUnavailable.addClass('alert-warning');
                         usernameUnavailable.removeClass('alert-success');
                     }}
@@ -358,7 +358,7 @@ usernameTextbox.blur(function () {{
             }});
         }}
     }} else {{
-        usernameUnavailable.html(usernameFieldLabel + ' is required!');
+        usernameUnavailable.html(usernameFieldLabel + ' is required.');
         usernameUnavailable.addClass('alert-warning');
         usernameUnavailable.removeClass('alert-success');
     }}
@@ -521,6 +521,16 @@ usernameTextbox.blur(function () {{
                         return;
                     }
                 }
+                else
+                {
+                    var regexString = Rock.Web.Cache.GlobalAttributesCache.Get().GetValue( "core.ValidUsernameRegularExpression" );
+                    var match = System.Text.RegularExpressions.Regex.Match( tbUserName.Text, regexString );
+                    if ( !match.Success )
+                    {
+                        ShowErrorMessage( GetAttributeValue( AttributeKey.UsernameFieldLabel ) + " is not valid. " + Rock.Web.Cache.GlobalAttributesCache.Get().GetValue( "core.ValidUsernameCaption" ) );
+                        return;
+                    }
+                }
 
                 if ( UserLoginService.IsPasswordValid( tbPassword.Text ) )
                 {
@@ -533,7 +543,7 @@ usernameTextbox.blur(function () {{
                     }
                     else
                     {
-                        ShowErrorMessage( "Username already exists" );
+                        ShowErrorMessage( "That " + GetAttributeValue( AttributeKey.UsernameFieldLabel ) + " is already taken." );
                     }
                 }
                 else
